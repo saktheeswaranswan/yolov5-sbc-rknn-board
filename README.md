@@ -1,4 +1,3 @@
-<a href="https://apps.apple.com/app/id1452689527" target="_blank">
 模型训练：python3 train.py
 
 模型导出：python3 models/export.py --weights "xxx.pt"
