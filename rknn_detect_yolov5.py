@@ -1,17 +1,12 @@
-import dynamic_config
 from rknn.api import RKNN
 import cv2
 import numpy as np
 import cv2
 import time
 
-
-def read_class_names(class_file_name):
-    names = {}
-    with open(class_file_name, 'r') as data:
-        for ID, name in enumerate(data):
-            names[ID] = name.strip('\n').split(' ')[0]
-    return names
+"""
+yolov5 预测脚本 for rknn
+"""
 
 
 def sigmoid(x):
@@ -137,13 +132,11 @@ def load_rknn_model(PATH):
 
 RKNN_MODEL_PATH = r"xxx.rknn"
 SIZE = (416, 416)
-dict_labels = read_class_names(dynamic_config.wzsbcfg.getClassNames())
-num_classes = len(dict_labels)
+CLASSES = ("classA", "classB")
 OBJ_THRESH = 0.4
 NMS_THRESH = 0.5
 MASKS = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
 ANCHORS = [[10, 13], [16, 30], [33, 23], [30, 61], [62, 45], [59, 119], [116, 90], [156, 198], [373, 326]]
-CLASSES = dict_labels
 
 
 def predict(img_src, rknn):
@@ -214,6 +207,11 @@ def predict(img_src, rknn):
 
 
 if __name__ == '__main__':
+    RKNN_MODEL_PATH = r"xxx.rknn"
+    SIZE = (416, 416)
+    CLASSES = ("classA", "classB")
+    OBJ_THRESH = 0.4
+    NMS_THRESH = 0.5
     rknn = load_rknn_model(RKNN_MODEL_PATH)
     predict.__defaults__ = (None, rknn)
     img = cv2.imread("xxxx.png")
