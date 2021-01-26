@@ -1,6 +1,9 @@
 <a href="https://apps.apple.com/app/id1452689527" target="_blank">
-<img src="https://user-images.githubusercontent.com/26833433/98699617-a1595a00-2377-11eb-8145-fc674eb9b1a7.jpg" width="1000"></a>
-&nbsp
+模型训练：python3 train.py
+
+模型导出：python3 models/export.py --weights "xxx.pt"
+
+模型推理：python3 rknn_detect_yolov5.py
 
 ![CI CPU testing](https://github.com/ultralytics/yolov5/workflows/CI%20CPU%20testing/badge.svg)
 
