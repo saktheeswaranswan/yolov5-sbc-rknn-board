@@ -7,6 +7,9 @@ import numpy as np
 import cv2
 from rknn.api import RKNN
 
+""""
+将onnx模型转换为rknn模型
+"""
 
 def show_outputs(outputs):
     output = outputs[0][0]
@@ -56,8 +59,8 @@ def show_progress(blocknum, blocksize, totalsize):
 
 
 if __name__ == '__main__':
-    # ONNX_MODEL = 'yolov5m_416x416.onnx'
-    # RKNN_MODEL = 'yolov5m_416x416.rknn'
+    ONNX_MODEL = 'yolov5m_416x416.onnx'
+    RKNN_MODEL = 'yolov5m_416x416.rknn'
 
     # Create RKNN object
     rknn = RKNN()
