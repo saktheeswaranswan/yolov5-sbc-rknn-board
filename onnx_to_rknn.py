@@ -7,7 +7,7 @@ import numpy as np
 import cv2
 from rknn.api import RKNN
 
-"""" 
+""""
 将onnx模型转换为rknn模型
 """
 
