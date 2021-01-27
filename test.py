@@ -331,4 +331,4 @@ if __name__ == '__main__':
                 y.append(r + t)  # results and times
             np.savetxt(f, y, fmt='%10.4g')  # save
         os.system('zip -r study.zip study_*.txt')
-        plot_study_txt(f, x)  # plot
+        plot_study_txt(f, x)  # plot 
