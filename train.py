@@ -466,9 +466,9 @@ if __name__ == '__main__':
     parser.add_argument('--quad', action='store_true', help='quad dataloader')
     opt = parser.parse_args()
     
-    opt.image_weights = True
-    opt.cache_images = True
-    opt.notest = True
+    # opt.image_weights = True
+    # opt.cache_images = True
+    # opt.notest = True
 
     # Set DDP variables
     opt.world_size = int(os.environ['WORLD_SIZE']) if 'WORLD_SIZE' in os.environ else 1
