@@ -7,3 +7,5 @@
 模型推理：python3 rknn_detect_yolov5.py
 
 原版仓库：https://github.com/ultralytics/yolov5
+
+python version >= 3.6
