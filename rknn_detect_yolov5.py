@@ -188,11 +188,9 @@ def predict(img_src, rknn):
     boxes = np.concatenate(nboxes)
     classes = np.concatenate(nclasses)
     scores = np.concatenate(nscores)
-    boxes, classes, scores
     label_list = []
     box_list = []
-    for box, score, cl in zip(boxes, scores, classes):
-        x, y, w, h = box
+    for (x, y, w, h), score, cl in zip(boxes, scores, classes):
         x *= img_src.shape[1]
         y *= img_src.shape[0]
         w *= img_src.shape[1]
