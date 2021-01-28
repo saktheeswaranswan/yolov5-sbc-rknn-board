@@ -206,7 +206,7 @@ def predict(img_src, rknn):
 
 if __name__ == '__main__':
     RKNN_MODEL_PATH = r"xxx.rknn"
-    SIZE = (416, 416)
+    SIZE = (640, 640)
     CLASSES = ("classA", "classB")
     OBJ_THRESH = 0.4
     NMS_THRESH = 0.5

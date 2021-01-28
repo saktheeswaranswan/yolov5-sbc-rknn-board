@@ -12,8 +12,8 @@ from rknn.api import RKNN
 """
 
 if __name__ == '__main__':
-    ONNX_MODEL = 'yolov5m_416x416.onnx'
-    RKNN_MODEL = 'yolov5m_416x416.rknn'
+    ONNX_MODEL = 'yolov5m_640x640.onnx'
+    RKNN_MODEL = 'yolov5m_640x640.rknn'
 
     # Create RKNN object
     rknn = RKNN()
