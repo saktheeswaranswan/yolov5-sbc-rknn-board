@@ -1,19 +1,46 @@
-from rknn.api import RKNN
-import cv2
-import numpy as np
 import cv2
 import time
+import numpy as np
+from rknn.api import RKNN
 
 """
 yolov5 预测脚本 for rknn
 """
 
 
+def get_max_scale(img, max_w, max_h):
+    h, w = img.shape[:2]
+    scale = min(max_w / w, max_h / h, 1)
+    return scale
+
+
+def get_new_size(img, scale):
+    return tuple(map(int, np.array(img.shape[:2][::-1]) * scale))
+
+
+class Size:
+    def __init__(self, img, max_w, max_h):
+        self._src_img = img
+        self.scale = get_max_scale(img, max_w, max_h)
+        self._new_size = get_new_size(img, self.scale)
+        self.__new_img = None
+
+    @property
+    def size(self):
+        return self._new_size
+
+    @property
+    def new_img(self):
+        if self.__new_img is None:
+            self.__new_img = cv2.resize(self._src_img, self._new_size)
+        return self.__new_img
+
+
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
 
-def filter_boxes(boxes, box_confidences, box_class_probs) -> (np.ndarray, np.ndarray, np.ndarray):
+def filter_boxes(boxes, box_confidences, box_class_probs):
     box_scores = box_confidences * box_class_probs  # 条件概率， 在该cell存在物体的概率的基础上是某个类别的概率
     box_classes = np.argmax(box_scores, axis=-1)  # 找出概率最大的类别索引
     box_class_scores = np.max(box_scores, axis=-1)  # 最大类别对应的概率值
@@ -55,40 +82,12 @@ def nms_boxes(boxes, scores):
     return keep
 
 
-def draw(image, boxes, scores, classes):
-    """Draw the boxes on the image.
-
-    # Argument:
-        image: original image.
-        boxes: ndarray, boxes of objects.
-        classes: ndarray, classes of objects.
-        scores: ndarray, scores of objects.
-        all_classes: all classes name.
-    """
-    labels = []
-    box_ls = []
-    for box, score, cl in zip(boxes, scores, classes):
-        x, y, w, h = box
-        print('class: {}, score: {}'.format(CLASSES[cl], score))
-        print('box coordinate left,top,right,down: [{}, {}, {}, {}]'.format(x, y, x + w, y + h))
-        x *= image.shape[1]
-        y *= image.shape[0]
-        w *= image.shape[1]
-        h *= image.shape[0]
-        top = max(0, np.floor(x).astype(int))
-        left = max(0, np.floor(y).astype(int))
-        right = min(image.shape[1], np.floor(x + w + 0.5).astype(int))
-        bottom = min(image.shape[0], np.floor(y + h + 0.5).astype(int))
-        print('class: {}, score: {}'.format(CLASSES[cl], score))
-        print('box coordinate left,top,right,down: [{}, {}, {}, {}]'.format(top, left, right, bottom))
-        labels.append(CLASSES[cl])
-        box_ls.append((top, left, right, bottom))
-        cv2.rectangle(image, (top, left), (right, bottom), (255, 0, 0), 2)
-        cv2.putText(image, '{0} {1:.2f}'.format(CLASSES[cl], score),
-                    (top, left - 6),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.6, (0, 0, 255), 2)
-    return labels, box_ls
+def letterbox(img, new_wh=(416, 416), color=(114, 114, 114)):
+    s = Size(img, *new_wh)
+    new_img = s.new_img
+    h, w = new_img.shape[:2]
+    new_img = cv2.copyMakeBorder(new_img, 0, new_wh[1] - h, 0, new_wh[0] - w, cv2.BORDER_CONSTANT, value=color)
+    return new_img, (new_wh[0] / s.scale, new_wh[1] / s.scale)
 
 
 def load_model0(model_path, npu_id):
@@ -100,7 +99,6 @@ def load_model0(model_path, npu_id):
             device_id_dict[0] = dev_id
         if dev_id[:2] == 'TS':
             device_id_dict[1] = dev_id
-
     print('-->loading model : ' + model_path)
     rknn.load_rknn(model_path)
     print('--> Init runtime environment on: ' + device_id_dict[npu_id])
@@ -140,7 +138,8 @@ ANCHORS = [[10, 13], [16, 30], [33, 23], [30, 61], [62, 45], [59, 119], [116, 90
 
 
 def predict(img_src, rknn):
-    img = cv2.resize(img_src, SIZE)
+    src_h, src_w = img_src.shape[:2]
+    img, gain = letterbox(img_src, SIZE)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     t0 = time.time()
     print("img shape               \t:", img.shape)
@@ -191,14 +190,14 @@ def predict(img_src, rknn):
     label_list = []
     box_list = []
     for (x, y, w, h), score, cl in zip(boxes, scores, classes):
-        x *= img_src.shape[1]
-        y *= img_src.shape[0]
-        w *= img_src.shape[1]
-        h *= img_src.shape[0]
+        x *= gain[0]
+        y *= gain[1]
+        w *= gain[0]
+        h *= gain[1]
         top = max(0, np.floor(x).astype(int))
         left = max(0, np.floor(y).astype(int))
-        right = min(img_src.shape[1], np.floor(x + w + 0.5).astype(int))
-        bottom = min(img_src.shape[0], np.floor(y + h + 0.5).astype(int))
+        right = min(src_w, np.floor(x + w + 0.5).astype(int))
+        bottom = min(src_h, np.floor(y + h + 0.5).astype(int))
         label_list.append(CLASSES[cl])
         box_list.append((top, left, right, bottom))
     return label_list, np.array(box_list)
