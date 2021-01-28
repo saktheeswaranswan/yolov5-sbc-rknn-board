@@ -191,12 +191,12 @@ class RKNNDetector:
             y *= gain[1]
             w *= gain[0]
             h *= gain[1]
-            top = max(0, np.floor(x).astype(int))
-            left = max(0, np.floor(y).astype(int))
-            right = min(src_w, np.floor(x + w + 0.5).astype(int))
-            bottom = min(src_h, np.floor(y + h + 0.5).astype(int))
+            x1 = max(0, np.floor(x).astype(int))
+            y1 = max(0, np.floor(y).astype(int))
+            x2 = min(src_w, np.floor(x + w + 0.5).astype(int))
+            y2 = min(src_h, np.floor(y + h + 0.5).astype(int))
             label_list.append(self.classes[cl])
-            box_list.append((top, left, right, bottom))
+            box_list.append((x1, y1, x2, y2))
         return label_list, box_list
 
     def predict_resize(self, img_src, conf_thres=0.4, iou_thres=0.45):
