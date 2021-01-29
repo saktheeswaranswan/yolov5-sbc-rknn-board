@@ -145,6 +145,7 @@ class Detect:
     def __init__(self, model, size, names, anchors=()):  # detection layer
         self.size = size
         nc = len(names)
+        self.names = names
         self.nc = nc  # number of classes
         self.no = nc + 5  # number of outputs per anchor
         self.nl = len(anchors)  # number of detection layers
@@ -190,7 +191,7 @@ class Detect:
         boxes[:, 3].clamp_(0, img_shape[0])  # y2
         if draw_box:
             for *xyxy, conf, cls in pred_res:
-                label = '%s %.2f' % (CLASSES[int(cls)], conf)
+                label = '%s %.2f' % (self.names[int(cls)], conf)
                 plot_one_box(xyxy, img_src, label=label, color=self.colors[int(cls)], line_thickness=3)
         return pred_res
 
