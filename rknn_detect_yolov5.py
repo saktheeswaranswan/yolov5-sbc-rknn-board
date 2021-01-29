@@ -1,5 +1,6 @@
 import cv2
 import time
+import random
 import numpy as np
 from rknn.api import RKNN
 
@@ -82,6 +83,19 @@ def nms_boxes(boxes, scores, iou_thres):
     return keep
 
 
+def plot_one_box(x, img, color=None, label=None, line_thickness=None):
+    tl = line_thickness or round(0.002 * (img.shape[0] + img.shape[1]) / 2) + 1  # line/font thickness
+    color = color or [random.randint(0, 255) for _ in range(3)]
+    c1, c2 = (int(x[0]), int(x[1])), (int(x[2]), int(x[3]))
+    cv2.rectangle(img, c1, c2, color, thickness=tl, lineType=cv2.LINE_AA)
+    if label:
+        tf = max(tl - 1, 1)  # font thickness
+        t_size = cv2.getTextSize(label, 0, fontScale=tl / 3, thickness=tf)[0]
+        c2 = c1[0] + t_size[0], c1[1] - t_size[1] - 3
+        cv2.rectangle(img, c1, c2, color, -1, cv2.LINE_AA)  # filled
+        cv2.putText(img, label, (c1[0], c1[1] - 2), 0, tl / 3, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
+
+
 def letterbox(img, new_wh=(416, 416), color=(114, 114, 114)):
     a = AutoScale(img, *new_wh)
     new_img = a.new_img
@@ -127,14 +141,15 @@ def load_rknn_model(PATH):
 
 
 class RKNNDetector:
-    def __init__(self, model, wh, masks, anchors, classes):
+    def __init__(self, model, wh, masks, anchors, names):
         self.wh = wh
         self._masks = masks
         self._anchors = anchors
-        self.classes = classes
+        self.names = names
         if isinstance(model, str):
             model = load_rknn_model(model)
         self._rknn = model
+        self.draw_box = False
 
     def _predict(self, img_src, _img, gain, conf_thres=0.4, iou_thres=0.45):
         src_h, src_w = img_src.shape[:2]
@@ -195,8 +210,10 @@ class RKNNDetector:
             y1 = max(0, np.floor(y).astype(int))
             x2 = min(src_w, np.floor(x + w + 0.5).astype(int))
             y2 = min(src_h, np.floor(y + h + 0.5).astype(int))
-            label_list.append(self.classes[cl])
+            label_list.append(self.names[cl])
             box_list.append((x1, y1, x2, y2))
+            if self.draw_box:
+                plot_one_box((x1, y1, x2, y2), img_src, label=self.names[cl])
         return label_list, box_list
 
     def predict_resize(self, img_src, conf_thres=0.4, iou_thres=0.45):
