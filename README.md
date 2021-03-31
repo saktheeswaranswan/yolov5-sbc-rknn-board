@@ -16,8 +16,9 @@
 建议：在训练时如果size不是640，那么可以先通过聚类得到anchors并将新的anchors写入到模型配置文件中，然后再训练，防止动态获取的anchors在rknn上预测不准的问题。训练参数别忘记加上 --noautoanchor。
 
 #新增支持原版模型：
+
 使用方法：
-1.下载yolov5原版仓库：```https://github.com/ultralytics/yolov5```
+1.下载yolov5原版仓库：https://github.com/ultralytics/yolov5
 
 2.训练模型
 
