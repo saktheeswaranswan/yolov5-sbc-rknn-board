@@ -259,7 +259,7 @@ if __name__ == '__main__':
     image = cv2.imread("data/images/bus.jpg")
     with open("models/yolov5_rknn_640x640.yaml", "rb") as f:
         cfg = yaml.load(f, yaml.FullLoader)
-        d = Detector(cfg)
+        d = Detector(cfg["opt"])
         d.draw_box = True
         d.detect(image)
         cv2.imshow("res", image)
