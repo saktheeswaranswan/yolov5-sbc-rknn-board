@@ -25,17 +25,17 @@
 
 3.导出onnx模型
 ```
-	python export_no_focus.py  --weights weights/yolov5s.pt  --img-size 640 640
-	所有size均指 width,height .............. 所有shape指 height,width
+python export_no_focus.py  --weights weights/yolov5s.pt  --img-size 640 640
+所有size均指 width,height .............. 所有shape指 height,width
 ```
 4.转换为rknn模型
 ```
-	python onnx2rknn.py --onnx weights/yolov5s.onnx  --precompile  --original
-	模型默认和onnx在同一目录
+python onnx2rknn.py --onnx weights/yolov5s.onnx  --precompile  --original
+模型默认和onnx在同一目录
 ```
 5.rknn推理
 ```
-	python rknn_detect_for_yolov5_original.py
+python rknn_detect_for_yolov5_original.py
 ```
 当然也可以使用我修改的版本yolov5_original，支持直接使用xml标注文件
 
