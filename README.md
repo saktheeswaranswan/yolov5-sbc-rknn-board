@@ -21,6 +21,7 @@
 2.训练模型
 3.导出onnx模型
 	python export_no_focus.py  --weights weights/yolov5s.pt  --img-size 640 640
+	所有size均指 wdith,height .............. 所有shape指 height,width
 4.转换为rknn模型
 	python onnx2rknn.py --onnx weights/yolov5s.onnx  --precompile  --original
 	模型默认和onnx在同一目录
